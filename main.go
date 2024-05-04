@@ -1,16 +1,13 @@
 package main
 
 import (
-	"context"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
 	"fmt"
-	mathrand "math/rand"
 	"net"
-	"net/http"
 	"os"
-	"sync"
+	"strconv"
 	"time"
 
 	tcell "github.com/gdamore/tcell/v2"
@@ -19,27 +16,21 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-var (
-	// payment session timeout
-	paymentTimeout = time.Duration(10 * time.Minute)
-)
-
 func main() {
-	// read a bind address and port from the command line
-	// if none are provided, use the default values
-	bindAddr := "127.0.0.1"
-	port := "8080"
-	// externAddr will be the address that the client will use to connect to the server
-	externAddr := bindAddr
-	// read from the command line
-	if len(os.Args) > 1 {
-		externAddr = os.Args[1]
+	// if no arguments are given, run locally
+	if len(os.Args) == 1 {
+		runLocal()
+		return
 	}
+
+	// if some arguments are given, run the server
+
+	port := "2222"
+	// address read from the command line
+	bindAddr := os.Args[1]
+	// optional port read from the command line
 	if len(os.Args) > 2 {
-		bindAddr = os.Args[2]
-	}
-	if len(os.Args) > 3 {
-		port = os.Args[3]
+		port = os.Args[2]
 	}
 
 	bindIP := net.ParseIP(bindAddr)
@@ -48,58 +39,34 @@ func main() {
 		os.Exit(1)
 	}
 
+	portNum, err := strconv.ParseInt(port, 10, 16)
+	if err != nil {
+		fmt.Printf("invalid port number: %s\n", port)
+	}
 	log.Infof("Starting server on %s:%s\n", bindAddr, port)
 
-	// create the API server
-	createAPIServer(externAddr, port, bindIP)
-
+	// create the shell server
+	runServer(bindIP, portNum)
 }
 
-// createAPIServer will create a new HTTP server to receive requests
-// to create HTTP servers
-func createAPIServer(externAddr, port string, bindIP net.IP) {
-
-	http.HandleFunc("/create", func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-
-		log.WithContext(ctx).Info("received request to create payment server")
-
-		// parse the amount from the request url param
-		amountStr := r.URL.Query().Get("amount")
-		if amountStr == "" {
-			http.Error(w, "missing amount", http.StatusBadRequest)
-			return
-		}
-
-		connectStr, err := createPaymentSSHServer(ctx, amountStr, externAddr, bindIP)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("failed to create payment server: %v", err), http.StatusInternalServerError)
-			return
-		}
-
-		// return a 200 response
-		w.Write([]byte(fmt.Sprintf("%s\r\n", connectStr)))
-	})
-
-	// generate a random tls certificate and key
-	http.ListenAndServe(fmt.Sprintf("%s:%s", bindIP, port), nil)
+func runLocal() {
+	screen, err := tcell.NewScreen()
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		os.Exit(1)
+	}
+	runApp(screen)
 }
 
-// createPaymentSSHServer server creates a new SSH server on a random port, with a random
-// user and password, to accept payment details. It returns a connection string if sucessful,
-// or an error if not.
-func createPaymentSSHServer(ctx context.Context, amount, externAddr string, bindIP net.IP) (string, error) {
-	// generate a random user name of the form "payme" suffixed by six random digits
-	username := fmt.Sprintf("payme%06d", mathrand.Intn(1000000))
-
+func runServer(bindIP net.IP, bindPort int64) {
 	// generate a random ecdsa key pair for the server
 	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
-		return "", fmt.Errorf("failed to generate server key: %w", err)
+		log.Fatalf("failed to generate server key: %v", err)
 	}
 	signer, err := ssh.NewSignerFromKey(privateKey)
 	if err != nil {
-		return "", fmt.Errorf("failed to create signer: %w", err)
+		log.Fatalf("failed to create signer: %v", err)
 	}
 
 	// create a server config
@@ -109,110 +76,35 @@ func createPaymentSSHServer(ctx context.Context, amount, externAddr string, bind
 	config.AddHostKey(signer)
 
 	// create a listener on a random port
-	listener, err := net.ListenTCP("tcp", &net.TCPAddr{IP: bindIP, Port: 0})
+	listener, err := net.ListenTCP("tcp", &net.TCPAddr{IP: bindIP, Port: int(bindPort)})
 	if err != nil {
-		return "", fmt.Errorf("failed to listen: %w", err)
-	}
-
-	// get the port from the listener
-	_, port, err := net.SplitHostPort(listener.Addr().String())
-	if err != nil {
-		return "", fmt.Errorf("failed to get port: %w", err)
+		log.Fatalf("failed to listen: %v", err)
 	}
 
 	// log the listender
-	log.WithContext(ctx).Infof("SSH connection listening on %s", listener.Addr().String())
+	log.Infof("SSH connection listening on %s", listener.Addr().String())
 
-	// create connection string for the server that can be used to ssh to the listerner
-	// with the given username and password
-	connStr := fmt.Sprintf("ssh %s@%s -p %s", username, externAddr, port)
+	for {
 
-	// TODO: put the response in a struct
-	// TODO: add the server key fingerprint to the response
-
-	// create the server in a goroutine
-	go func() {
-		// TODO: create from a parent context in main
-		ctx, cancelFn := context.WithCancel(context.Background())
-
-		select {
-		case <-time.After(paymentTimeout):
-			log.WithContext(ctx).Infof("payment server on %s timed out", listener.Addr().String())
-		case <-runPaymentService(ctx, *listener, config, amount):
-			//TODO : log any error in the result
-			log.WithContext(ctx).Infof("payment completed on %s", listener.Addr().String())
-		}
-		cancelFn()
-	}()
-
-	return connStr, nil
-}
-
-type sessionResult struct {
-	err error
-}
-
-func runPaymentService(ctx context.Context, listener net.TCPListener, config *ssh.ServerConfig, amount string) <-chan sessionResult {
-	done := make(chan sessionResult)
-
-	go func() {
-		// create a wait group to track sessions in flight
-		wg := sync.WaitGroup{}
-
-		connectionResult := make(chan sessionResult)
-		defer close(done)
-		defer close(connectionResult)
-		defer func() {
-			log.WithContext(ctx).Infof("closing listener %s", listener.Addr().String())
-			_ = listener.Close()
-		}()
-
-	Loop:
-		for {
-			// do not continue if the context has been cancelled
-			select {
-			case <-ctx.Done():
-				break Loop
-			case result := <-connectionResult:
-				// decrement the wait group
-				log.WithContext(ctx).Infof("connection result: %v", result.err)
-				wg.Done()
-				if result.err != nil {
-					done <- sessionResult{err: fmt.Errorf("failed to accept connection: %w", result.err)}
-				} else {
-					done <- sessionResult{}
-					break Loop
-				}
-			default:
-				// accept more connections
+		// set a deadline for the listener to accept a connection
+		listener.SetDeadline(time.Now().Add(5 * time.Second))
+		// accept a connection
+		conn, err := listener.Accept()
+		if err != nil {
+			// if the error is due to a timeout, continue to the next iteration
+			if ne, ok := err.(net.Error); ok && ne.Timeout() {
+				continue
 			}
-
-			// set a deadline for the listener to accept a connection
-			listener.SetDeadline(time.Now().Add(5 * time.Second))
-			// accept a connection
-			conn, err := listener.Accept()
-			if err != nil {
-				// if the error is due to a timeout, continue to the next iteration
-				if ne, ok := err.(net.Error); ok && ne.Timeout() {
-					continue
-				}
-				done <- sessionResult{err: fmt.Errorf("failed to accept connection: %w", err)}
-				return
-			}
-
-			log.WithContext(ctx).Infof("accepted connection from %s", conn.RemoteAddr().String())
-
-			wg.Add(1)
-			go handleConnection(ctx, conn, config, amount, connectionResult)
+			return
 		}
-		log.WithContext(ctx).Infof("waiting for connections to close")
-		wg.Wait()
-		log.WithContext(ctx).Infof("connections have closed")
-	}()
-	return done
+
+		log.Infof("accepted connection from %s", conn.RemoteAddr().String())
+
+		go handleConnection(conn, config)
+	}
 }
 
-func handleConnection(ctx context.Context, conn net.Conn, config *ssh.ServerConfig, amount string, connectionResult chan<- sessionResult) {
+func handleConnection(conn net.Conn, config *ssh.ServerConfig) {
 	// handle the connection
 	server, chans, reqs, err := ssh.NewServerConn(conn, config)
 	if err != nil {
@@ -262,7 +154,7 @@ func handleConnection(ctx context.Context, conn net.Conn, config *ssh.ServerConf
 					if err != nil {
 						log.Errorf("failed to unmarshal pty request: %v", err)
 					}
-					pty.UpdateWindow(tcell.WindowSize{Width: pty.windowSize.Width, Height: pty.windowSize.Height, PixelWidth: pty.windowSize.PixelWidth, PixelHeight: pty.windowSize.PixelHeight})
+					pty.UpdateWindow(tcell.WindowSize{Width: int(ptyReq.Columns), Height: int(ptyReq.Rows), PixelWidth: int(ptyReq.Width), PixelHeight: int(ptyReq.Height)})
 					log.Infof("pty request: %v", ptyReq)
 				}
 				req.Reply(ok, nil)
@@ -270,24 +162,29 @@ func handleConnection(ctx context.Context, conn net.Conn, config *ssh.ServerConf
 		}()
 
 		log.Info("starting application session")
-		app := tview.NewApplication()
-		app.SetScreen(screen)
-		box := tview.NewBox().SetBorder(true).SetTitle("Payment")
-		go func() { err = app.SetRoot(box, true).Run() }()
-		if err != nil {
-			log.Errorf("failed to run app: %v", err)
-		}
 
-		time.Sleep(30 * time.Second)
-
-		// send the result
-		connectionResult <- sessionResult{err: nil}
+		runApp(screen)
 
 		// close the channel
 		channel.Close()
 	}
 	server.Close()
-	log.WithContext(ctx).Infof("completed session from %s", conn.RemoteAddr().String())
+	log.Infof("completed session from %s", conn.RemoteAddr().String())
+}
+
+func runApp(screen tcell.Screen) {
+	app := tview.NewApplication()
+	app.SetScreen(screen)
+	form := tview.NewForm().
+		AddInputField("Enter Card Number", "", 16, nil, nil).
+		AddButton("Submit", nil).
+		AddButton("Quit", func() {
+			app.Stop()
+		})
+	form.SetBorder(true).SetTitle("Enter Payment Details").SetTitleAlign(tview.AlignLeft)
+	if err := app.SetRoot(form, true).Run(); err != nil {
+		log.Errorf("failed to run app: %v", err)
+	}
 }
 
 type ptyRequestMsg struct {
@@ -312,15 +209,18 @@ func (s *sshtty) Close() error {
 
 // Read implements tcell.Tty.
 func (s *sshtty) Read(p []byte) (n int, err error) {
+	log.Infof("pty read %d bytes", len(p))
 	return s.channel.Read(p)
 }
 
 // Write implements tcell.Tty.
 func (s *sshtty) Write(p []byte) (n int, err error) {
+	log.Infof("pty write %d bytes", len(p))
 	return s.channel.Write(p)
 }
 
 func (s *sshtty) UpdateWindow(size tcell.WindowSize) {
+	log.Infof("updating window size: %v", size)
 	s.windowSize = size
 	if s.windowCb != nil {
 		s.windowCb()
@@ -349,6 +249,7 @@ func (s *sshtty) Stop() error {
 
 // WindowSize implements tcell.Tty.
 func (s *sshtty) WindowSize() (tcell.WindowSize, error) {
+	log.Infof("checking window size: %v", s.windowSize)
 	return s.windowSize, nil
 }
 
