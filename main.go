@@ -263,6 +263,7 @@ func handleConnection(ctx context.Context, conn net.Conn, config *ssh.ServerConf
 						log.Errorf("failed to unmarshal pty request: %v", err)
 					}
 					pty.UpdateWindow(tcell.WindowSize{Width: pty.windowSize.Width, Height: pty.windowSize.Height, PixelWidth: pty.windowSize.PixelWidth, PixelHeight: pty.windowSize.PixelHeight})
+					log.Infof("pty request: %v", ptyReq)
 				}
 				req.Reply(ok, nil)
 			}
@@ -271,7 +272,7 @@ func handleConnection(ctx context.Context, conn net.Conn, config *ssh.ServerConf
 		log.Info("starting application session")
 		app := tview.NewApplication()
 		app.SetScreen(screen)
-		box := tview.NewBox().SetBorder(true).SetTitle("Payment").SetTitleAlign(tview.AlignCenter).SetBorderPadding(1, 1, 2, 2)
+		box := tview.NewBox().SetBorder(true).SetTitle("Payment")
 		go func() { err = app.SetRoot(box, true).Run() }()
 		if err != nil {
 			log.Errorf("failed to run app: %v", err)
