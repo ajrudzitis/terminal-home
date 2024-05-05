@@ -5,7 +5,7 @@ import (
 	"net"
 	"time"
 
-	pkgPty "github.com/ajrudzitis/terminal-resume/pty"
+	pkgPty "github.com/ajrudzitis/terminal-home/pty"
 	"github.com/gdamore/tcell/v2"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"

@@ -7,8 +7,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/ajrudzitis/terminal-resume/app"
-	"github.com/ajrudzitis/terminal-resume/ssh"
+	"github.com/ajrudzitis/terminal-home/app"
+	"github.com/ajrudzitis/terminal-home/ssh"
 	log "github.com/sirupsen/logrus"
 	cryptossh "golang.org/x/crypto/ssh"
 )

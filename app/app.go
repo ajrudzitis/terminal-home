@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 
-	"github.com/ajrudzitis/terminal-resume/pty"
+	"github.com/ajrudzitis/terminal-home/pty"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 	log "github.com/sirupsen/logrus"

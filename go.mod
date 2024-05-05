@@ -1,4 +1,4 @@
-module github.com/ajrudzitis/terminal-resume
+module github.com/ajrudzitis/terminal-home
 
 go 1.22.1
 
