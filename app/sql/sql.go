@@ -24,6 +24,7 @@ func SqlGameView(app *tview.Application, quitFn func()) {
 	terminalView := tview.NewTextView().SetChangedFunc(func() {
 		app.Draw()
 	})
+	// TODO add some type of auto scroll
 	terminalView.SetScrollable(false)
 
 	inputView := tview.NewInputField().SetLabel("sql> ").SetFieldWidth(0).SetFieldBackgroundColor(tview.Styles.PrimitiveBackgroundColor)
