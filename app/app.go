@@ -7,7 +7,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func Run(pty *pty.Pty) {
+type ResumeApp struct {
+}
+
+func (r *ResumeApp) Run(pty *pty.Pty) {
 	// create a new terminfo screen
 	screen, err := tcell.NewTerminfoScreenFromTty(pty)
 	if err != nil {

@@ -48,7 +48,8 @@ func main() {
 }
 
 func runLocal() {
-	app.Run(nil)
+	a := app.ResumeApp{}
+	a.Run(nil)
 }
 
 func runServer(bindIP net.IP, bindPort int64) {
@@ -57,5 +58,5 @@ func runServer(bindIP net.IP, bindPort int64) {
 	if err != nil {
 		log.Fatalf("failed to generate server key: %v", err)
 	}
-	ssh.NewServer(bindIP, bindPort, privateKey)
+	ssh.NewServer(bindIP, bindPort, privateKey, &app.ResumeApp{})
 }
