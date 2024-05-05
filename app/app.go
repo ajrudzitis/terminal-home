@@ -6,6 +6,7 @@ import (
 
 	"github.com/ajrudzitis/terminal-home/app/sql"
 	"github.com/ajrudzitis/terminal-home/pty"
+	"github.com/ajrudzitis/terminal-home/versioning"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 	log "github.com/sirupsen/logrus"
@@ -60,11 +61,14 @@ func (r *ResumeApp) mainMenu() {
 	}).SetTextAlign(tview.AlignCenter)
 	fmt.Fprint(banner, bannerContent)
 
+	version := tview.NewTextView().SetText(versioning.GetBuildSha())
+
 	mainView := tview.NewGrid().
 		SetRows(0, 0, 0).
 		SetColumns(0, 0, 0).
 		AddItem(menu, 1, 1, 1, 1, 0, 0, true).
-		AddItem(banner, 0, 0, 1, 3, 0, 0, false)
+		AddItem(banner, 0, 0, 1, 3, 0, 0, false).
+		AddItem(version, 2, 0, 0, 3, 0, 0, false)
 
 	r.tviewApp.SetRoot(mainView, true).SetFocus(menu)
 }

@@ -9,11 +9,14 @@ import (
 
 	"github.com/ajrudzitis/terminal-home/app"
 	"github.com/ajrudzitis/terminal-home/ssh"
+	"github.com/ajrudzitis/terminal-home/versioning"
 	log "github.com/sirupsen/logrus"
 	cryptossh "golang.org/x/crypto/ssh"
 )
 
 func main() {
+	log.Infof("build verison: %s", versioning.GetBuildSha())
+
 	bindStr := flag.String("b", "127.0.0.1", "bind address")
 	portStr := flag.String("p", "2222", "port number")
 
