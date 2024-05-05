@@ -15,3 +15,7 @@ jobs:
         run: go get .
       - name: Build
         run: go build -v -o terminal-home .
+      - name: Build Docker image
+        id: build-image
+        run: |
+          docker build -t terminal-home .

@@ -1,25 +1,13 @@
 # syntax=docker/dockerfile:1
 
-FROM golang:1.22
+FROM alpine:3.14
 
-# Set destination for COPY
-WORKDIR /app
 
-# Download Go modules
-COPY go.mod go.sum ./
-RUN go mod download
-
-# Copy the source code. Note the slash at the end, as explained in
-# https://docs.docker.com/reference/dockerfile/#copy
-COPY main.go ./
-COPY app/ ./app/
-COPY pty/ ./pty/
-COPY ssh/ ./ssh/
+# Copy the binary from the build stage
+COPY terminal-home /terminal-home
 
 ENV TERM xterm-256color
 
-# Build
-RUN CGO_ENABLED=0 GOOS=linux go build -o /terminal-home
 
 # Optional:
 # To bind to a TCP port, runtime parameters must be supplied to the docker command.
