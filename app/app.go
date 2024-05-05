@@ -35,6 +35,9 @@ func (r *ResumeApp) Run(pty *pty.Pty) {
 
 }
 
+//go:embed resources/banner.txt
+var bannerContent string
+
 func (r *ResumeApp) mainMenu() {
 	menu := tview.NewList().
 		AddItem("Resume", "", 'a', func() {
@@ -48,10 +51,16 @@ func (r *ResumeApp) mainMenu() {
 		})
 	menu.SetBorder(true).SetTitle("Main Menu")
 
+	banner := tview.NewTextView().SetChangedFunc(func() {
+		r.tviewApp.Draw()
+	}).SetTextAlign(tview.AlignCenter)
+	fmt.Fprint(banner, bannerContent)
+
 	mainView := tview.NewGrid().
 		SetRows(0, 0, 0).
 		SetColumns(0, 0, 0).
-		AddItem(menu, 1, 1, 1, 1, 0, 0, true)
+		AddItem(menu, 1, 1, 1, 1, 0, 0, true).
+		AddItem(banner, 0, 0, 1, 3, 0, 0, false)
 
 	r.tviewApp.SetRoot(mainView, true).SetFocus(menu)
 }
