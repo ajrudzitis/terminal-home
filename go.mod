@@ -1,4 +1,4 @@
-module github.com/ajrudzitis/ssh-resume
+module github.com/ajrudzitis/terminal-resume
 
 go 1.22.1
 
