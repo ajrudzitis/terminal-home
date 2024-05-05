@@ -5,14 +5,14 @@ import (
 	"fmt"
 
 	"github.com/gdamore/tcell/v2"
-	_ "github.com/proullon/ramsql/driver"
+	_ "github.com/glebarez/go-sqlite"
 	"github.com/rivo/tview"
 	log "github.com/sirupsen/logrus"
 )
 
 func SqlGameView(app *tview.Application, quitFn func()) {
 	// set up a new database
-	db, err := sql.Open("ramsql", "Experience")
+	db, err := sql.Open("sqlite", ":memory:")
 	if err != nil {
 		log.Errorf("failed to open database: %v", err)
 		quitFn()
