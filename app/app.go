@@ -41,7 +41,7 @@ var bannerContent string
 
 func (r *ResumeApp) mainMenu() {
 	menu := tview.NewList().
-		AddItem("Resume Brower", "", 'r', func() {
+		AddItem("SQL Shell", "", 's', func() {
 			sql.SqlGameView(r.tviewApp, r.mainMenu)
 		}).
 		AddItem("Resume", "", 'a', func() {

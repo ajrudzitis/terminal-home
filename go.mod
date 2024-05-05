@@ -5,6 +5,7 @@ go 1.22.1
 require (
 	github.com/gdamore/tcell/v2 v2.7.4
 	github.com/glebarez/go-sqlite v1.21.1
+	github.com/jedib0t/go-pretty/v6 v6.5.8
 	github.com/rivo/tview v0.0.0-20240501114654-1f4d5e8f881d
 	github.com/sirupsen/logrus v1.9.3
 	golang.org/x/crypto v0.22.0
