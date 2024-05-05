@@ -1,0 +1,16 @@
+CREATE TABLE jobs (id, company, team, title, start_date, end_date);
+CREATE TABLE job_experiences (job_id, description);
+INSERT INTO jobs (id, company, team, title, start_date, end_date) VALUES (1, 'Amazon Web Services', 'AWS Cryptography', 'Senior Software Engineer', '2015-01', '2019-12');
+INSERT INTO jobs (id, company, team, title, start_date, end_date) VALUES (2, 'Stripe', 'Core Technology', 'Staff Software Engineer', '2020-01', 'Present');
+INSERT INTO job_experiences (job_id, description) VALUES (1, 'Designed and led the implementation of an AWS Key Management Service feature to allow the use of keys stored in the AWS CloudHSM product. This project involved collaboration with over a dozen engineers over multiple AWS teams.');
+INSERT INTO job_experiences (job_id, description) VALUES (1, 'Designed and implemented changes to the AWS Key Management Service to achieve FIPS 140-2 validation.');
+INSERT INTO job_experiences (job_id, description) VALUES (1, 'Designed and led the implementation of an AWS Key Management Service feature to allow the import of keys by customers from on-premise hardware security modules.');
+INSERT INTO job_experiences (job_id, description) VALUES (1, 'Improved awareness of proper AWS KMS usage within Amazon through presentations to Amazon’s internal “Security Certifier” and Security Engineer community.');
+INSERT INTO job_experiences (job_id, description) VALUES (1, 'Conducted over 1200 interviews of candidates for technical and non-technical roles, including facilitating hiring discussions and decisions as a "bar raiser."');
+INSERT INTO job_experiences (job_id, description) VALUES (1, 'Other responsibilities include mentoring junior engineers as the “tech lead” for the team.');
+INSERT INTO job_experiences (job_id, description) VALUES (2, ' Currently leading a rearchitecture of Stripe’s cardholder data environment, working with stakeholders in infrastructure engineering, compliance, and security.');
+INSERT INTO job_experiences (job_id, description) VALUES (2, 'Designed and led the transition to AWS Nitro Enclaves for several sensitive workloads, strengthening Stripe’s overall security while removing a critical reliability risk.');
+INSERT INTO job_experiences (job_id, description) VALUES (2, 'Created a weekly operational review process used across the organization to review incidents and track overall operational health.');
+INSERT INTO job_experiences (job_id, description) VALUES (2, 'Developed and led the execution of a new, safer key rotation procedure to rotate Stripe’s Tier-0 and Tier-1 PCI encryption keys.');
+INSERT INTO job_experiences (job_id, description) VALUES (2, 'Collaborated with internal compliance teams to complete SOX, SOC, and PCI-DSS audits of Stripe’s cardholder data environment.');
+INSERT INTO job_experiences (job_id, description) VALUES (2, 'Collaborated with legal and product teams to develop a strategy for compliance with new India payment processor regulations.');

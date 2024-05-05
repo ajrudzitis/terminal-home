@@ -1,8 +1,12 @@
 package sql
 
 import (
+	"bufio"
 	"database/sql"
 	"fmt"
+	"strings"
+
+	_ "embed"
 
 	"github.com/gdamore/tcell/v2"
 	_ "github.com/glebarez/go-sqlite"
@@ -10,6 +14,9 @@ import (
 	"github.com/rivo/tview"
 	log "github.com/sirupsen/logrus"
 )
+
+//go:embed resources/init.sql
+var initalSql string
 
 func SqlGameView(app *tview.Application, quitFn func()) {
 	// set up a new database
@@ -19,6 +26,9 @@ func SqlGameView(app *tview.Application, quitFn func()) {
 		quitFn()
 		return
 	}
+
+	// load database from init.sql
+	initDb(db)
 
 	// render a simulated shell
 	terminalView := tview.NewTextView().SetChangedFunc(func() {
@@ -40,6 +50,9 @@ func SqlGameView(app *tview.Application, quitFn func()) {
 
 			// clear the input
 			inputView.SetText("")
+
+			// record the query
+			fmt.Fprintf(terminalView, "> %s\n", input)
 
 			// hack: make a nice query for showing tables
 			if input == ".tables" || input == "show tables" {
@@ -107,5 +120,18 @@ func SqlGameView(app *tview.Application, quitFn func()) {
 		AddItem(inputView, 2, 0, 1, 1, 0, 0, true)
 
 	app.SetRoot(mainView, true).SetFocus(inputView)
+
+}
+
+func initDb(db *sql.DB) {
+	// split initialsql into statements by line
+	scanner := bufio.NewScanner(strings.NewReader(initalSql))
+	for scanner.Scan() {
+		statement := scanner.Text()
+		_, err := db.Exec(statement)
+		if err != nil {
+			log.Errorf("sql: failed to execute statement: %v", err)
+		}
+	}
 
 }
