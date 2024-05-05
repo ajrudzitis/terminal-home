@@ -58,14 +58,21 @@ func (r *ResumeApp) mainMenu() {
 var resumeContent string
 
 func (r *ResumeApp) resume() {
+	r.textView("Resume", resumeContent)
+}
+
+//go:embed resources/about.txt
+var aboutContent string
+
+func (r *ResumeApp) about() {
+	r.textView("About", aboutContent)
+}
+
+func (r *ResumeApp) textView(title, content string) {
 	textView := tview.NewTextView().SetChangedFunc(func() {
 		r.tviewApp.Draw()
 	})
-	fmt.Fprint(textView, resumeContent)
-	textView.SetBorder(true).SetTitle("Aleks's Resume")
+	fmt.Fprint(textView, content)
+	textView.SetBorder(true).SetTitle(title)
 	r.tviewApp.SetRoot(textView, true).SetFocus(textView)
-}
-
-func (r *ResumeApp) about() {
-
 }

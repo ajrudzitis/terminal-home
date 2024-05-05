@@ -1,0 +1,3 @@
+This applicaiton was written in Go. 
+
+You can the source code at https://github.com/ajrudzitis/ssh-resume/
