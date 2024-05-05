@@ -1,0 +1,44 @@
+https://www.aleksrudzitis.com
+
+Work History
+
+Staff Software Engineer January 2020 - Present
+Core Technology - Stripe
+– Currently leading a rearchitecture of Stripe’s cardholder data environment, working with
+stakeholders in infrastructure engineering, compliance, and security.
+– Designed and led the transition to AWS Nitro Enclaves for several sensitive workloads,
+strengthening Stripe’s overall security while removing a critical reliability risk.
+– Created a weekly operational review process used across the organization to review incidents
+and track overall operational health.
+– Developed and led the execution of a new, safer key rotation procedure to rotate Stripe’s
+Tier-0 and Tier-1 PCI encryption keys.
+– Collaborated with internal compliance teams to complete SOX, SOC, and PCI-DSS audits of
+Stripe’s cardholder data environment.
+– Collaborated with legal and product teams to develop a strategy for compliance with new
+India payment processor regulations.
+
+Senior Software Development Engineer January 2015 - December 2019
+AWS Cryptography - Amazon Web Services
+– Designed and led the implementation of an AWS Key Management Service feature to allow
+the use of keys stored in the AWS CloudHSM product. This project involved collaboration
+with over a dozen engineers over multiple AWS teams.
+– Designed and implemented changes to the AWS Key Management Service to achieve FIPS
+140-2 validation.
+– Designed and led the implementation of an AWS Key Management Service feature to allow
+the import of keys by customers from on-premise hardware security modules.
+– Improved awareness of proper AWS KMS usage within Amazon through presentations to
+Amazon’s internal “Security Certifier” and Security Engineer community.
+– Conducted over 1200 interviews of candidates for technical and non-technical roles, including
+facilitating hiring discussions and decisions as a “bar raiser.”
+– Other responsibilities include mentoring junior engineers as the “tech lead” for the team.
+
+Software Development Engineer August 2010 - January 2015
+Amazon Services - Amazon.com
+Education
+
+
+University of Washington Seattle, WA
+Bachelors of Science, Informatics 2006 - 2010
+Bachelors of Science, Computer Science
+Misc
+ Private Pilot Certificate (SEL) and Remote Pilot Certificate

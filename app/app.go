@@ -1,6 +1,9 @@
 package app
 
 import (
+	_ "embed"
+	"fmt"
+
 	"github.com/ajrudzitis/ssh-resume/pty"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -51,9 +54,16 @@ func (r *ResumeApp) mainMenu() {
 	r.tviewApp.SetRoot(window, true).SetFocus(menu)
 }
 
+//go:embed resources/resume.txt
+var resumeContent string
+
 func (r *ResumeApp) resume() {
-	window := tview.NewBox().SetBorder(true).SetTitle("Resume")
-	r.tviewApp.SetRoot(window, true).SetFocus(window)
+	textView := tview.NewTextView().SetChangedFunc(func() {
+		r.tviewApp.Draw()
+	})
+	fmt.Fprint(textView, resumeContent)
+	textView.SetBorder(true).SetTitle("Aleks's Resume")
+	r.tviewApp.SetRoot(textView, true).SetFocus(textView)
 }
 
 func (r *ResumeApp) about() {
