@@ -8,6 +8,7 @@ import (
 )
 
 type ResumeApp struct {
+	tviewApp *tview.Application
 }
 
 func (r *ResumeApp) Run(pty *pty.Pty) {
@@ -21,22 +22,40 @@ func (r *ResumeApp) Run(pty *pty.Pty) {
 	// create a new application and set the screen
 	app := tview.NewApplication()
 	app.SetScreen(screen)
+	r.tviewApp = app
 
+	r.mainMenu()
+
+	if err := app.Run(); err != nil {
+		log.Errorf("app: failed to run application: %v", err)
+	}
+
+}
+
+func (r *ResumeApp) mainMenu() {
 	menu := tview.NewList().
-		AddItem("List item 1", "Some explanatory text", 'a', nil).
-		AddItem("List item 2", "Some explanatory text", 'b', nil).
-		AddItem("List item 3", "Some explanatory text", 'c', nil).
-		AddItem("List item 4", "Some explanatory text", 'd', nil).
-		AddItem("Quit", "Press to exit", 'q', func() {
-			app.Stop()
+		AddItem("Resume", "", 'a', func() {
+			r.resume()
+		}).
+		AddItem("About", "", 'b', func() {
+			r.about()
+		}).
+		AddItem("Quit", "", 'q', func() {
+			r.tviewApp.Stop()
 		})
 
 	window := tview.NewFrame(menu).
 		SetBorders(2, 2, 2, 2, 4, 4).
 		AddText("Aleks's Resume", true, tview.AlignCenter, tcell.ColorWhite)
 
-	if err := app.SetRoot(window, true).SetFocus(menu).Run(); err != nil {
-		panic(err)
-	}
+	r.tviewApp.SetRoot(window, true).SetFocus(menu)
+}
+
+func (r *ResumeApp) resume() {
+	window := tview.NewBox().SetBorder(true).SetTitle("Resume")
+	r.tviewApp.SetRoot(window, true).SetFocus(window)
+}
+
+func (r *ResumeApp) about() {
 
 }
