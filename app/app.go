@@ -73,6 +73,20 @@ func (r *ResumeApp) textView(title, content string) {
 		r.tviewApp.Draw()
 	})
 	fmt.Fprint(textView, content)
-	textView.SetBorder(true).SetTitle(title)
-	r.tviewApp.SetRoot(textView, true).SetFocus(textView)
+	textView.SetBorder(true).SetTitle(title).SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if event.Key() == tcell.KeyRune && event.Rune() == 'q' {
+			r.mainMenu()
+		}
+		return event
+
+	})
+
+	helpInfo := tview.NewTextView().
+		SetText("Press 'q' to return to the main menu")
+
+	mainView := tview.NewGrid().
+		SetRows(0, 1).
+		AddItem(textView, 0, 0, 1, 1, 0, 0, true).
+		AddItem(helpInfo, 1, 0, 1, 1, 0, 0, false)
+	r.tviewApp.SetRoot(mainView, true).SetFocus(textView)
 }
