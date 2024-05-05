@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 
+	"github.com/ajrudzitis/terminal-home/app/sql"
 	"github.com/ajrudzitis/terminal-home/pty"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -40,6 +41,9 @@ var bannerContent string
 
 func (r *ResumeApp) mainMenu() {
 	menu := tview.NewList().
+		AddItem("Resume Brower", "", 'r', func() {
+			sql.SqlGameView(r.tviewApp, r.mainMenu)
+		}).
 		AddItem("Resume", "", 'a', func() {
 			r.resume()
 		}).
