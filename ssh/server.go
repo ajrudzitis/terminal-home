@@ -18,13 +18,7 @@ type sshServer struct {
 }
 
 // NewServer creates a new SSH server
-func NewServer(bindIP net.IP, bindPort int64, privateKey interface{}, app SSHApplication) (*sshServer, error) {
-	// create a signer from the private key
-	signer, err := ssh.NewSignerFromKey(privateKey)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create signer from private key: %w", err)
-	}
-
+func NewServer(bindIP net.IP, bindPort int64, signer ssh.Signer, app SSHApplication) (*sshServer, error) {
 	// create a server config
 	config := &ssh.ServerConfig{
 		NoClientAuth: true,

@@ -1,9 +1,7 @@
 package main
 
 import (
-	"crypto/ecdsa"
-	"crypto/elliptic"
-	"crypto/rand"
+	"flag"
 	"fmt"
 	"net"
 	"os"
@@ -12,53 +10,56 @@ import (
 	"github.com/ajrudzitis/ssh-resume/app"
 	"github.com/ajrudzitis/ssh-resume/ssh"
 	log "github.com/sirupsen/logrus"
+	cryptossh "golang.org/x/crypto/ssh"
 )
 
 func main() {
-	// if no arguments are given, run locally
-	if len(os.Args) == 1 {
-		runLocal()
-		return
-	}
+	bindStr := flag.String("b", "127.0.0.1", "bind address")
+	portStr := flag.String("p", "2222", "port number")
 
-	// if some arguments are given, run the server
+	// load the server key
+	keyStr := flag.String("k", "", "path to the server private key")
 
-	port := "2222"
-	// address read from the command line
-	bindAddr := os.Args[1]
-	// optional port read from the command line
-	if len(os.Args) > 2 {
-		port = os.Args[2]
-	}
+	flag.Parse()
 
-	bindIP := net.ParseIP(bindAddr)
-	if bindIP == nil {
-		fmt.Printf("invalid bind address: %s\n", bindAddr)
+	// parse the private key
+	if *keyStr == "" {
+		fmt.Println("server private key is required")
 		os.Exit(1)
 	}
 
-	portNum, err := strconv.ParseInt(port, 10, 16)
+	// load the private key
+	pemBytes, err := os.ReadFile(*keyStr)
 	if err != nil {
-		fmt.Printf("invalid port number: %s\n", port)
+		fmt.Printf("failed to read private key: %v\n", err)
+		os.Exit(1)
 	}
-	log.Infof("Starting server on %s:%s\n", bindAddr, port)
+	signer, err := cryptossh.ParsePrivateKey(pemBytes)
+	if err != nil {
+		fmt.Printf("failed to parse private key: %v\n", err)
+		os.Exit(1)
+	}
+
+	// parse the bind address
+	bindIP := net.ParseIP(*bindStr)
+	if bindIP == nil {
+		fmt.Printf("invalid bind address: %s\n", *bindStr)
+		os.Exit(1)
+	}
+
+	// parse the port number
+	portNum, err := strconv.ParseInt(*portStr, 10, 16)
+	if err != nil {
+		fmt.Printf("invalid port number: %s\n", *portStr)
+	}
+	log.Infof("Starting server on %s:%s\n", *bindStr, *portStr)
 
 	// create the shell server
-	runServer(bindIP, portNum)
+	runServer(bindIP, portNum, signer)
 }
 
-func runLocal() {
-	a := app.ResumeApp{}
-	a.Run(nil)
-}
-
-func runServer(bindIP net.IP, bindPort int64) {
-	// generate a random ecdsa key pair for the server
-	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	if err != nil {
-		log.Fatalf("failed to generate server key: %v", err)
-	}
-	sshServer, err := ssh.NewServer(bindIP, bindPort, privateKey, &app.ResumeApp{})
+func runServer(bindIP net.IP, bindPort int64, signer cryptossh.Signer) {
+	sshServer, err := ssh.NewServer(bindIP, bindPort, signer, &app.ResumeApp{})
 	if err != nil {
 		log.Fatalf("failed to create SSH server: %v", err)
 	}
