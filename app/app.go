@@ -46,12 +46,14 @@ func (r *ResumeApp) mainMenu() {
 		AddItem("Quit", "", 'q', func() {
 			r.tviewApp.Stop()
 		})
+	menu.SetBorder(true).SetTitle("Main Menu")
 
-	window := tview.NewFrame(menu).
-		SetBorders(2, 2, 2, 2, 4, 4).
-		AddText("Aleks's Resume", true, tview.AlignCenter, tcell.ColorWhite)
+	mainView := tview.NewGrid().
+		SetRows(0, 0, 0).
+		SetColumns(0, 0, 0).
+		AddItem(menu, 1, 1, 1, 1, 0, 0, true)
 
-	r.tviewApp.SetRoot(window, true).SetFocus(menu)
+	r.tviewApp.SetRoot(mainView, true).SetFocus(menu)
 }
 
 //go:embed resources/resume.txt
