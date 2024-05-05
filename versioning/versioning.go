@@ -6,8 +6,8 @@ func GetBuildSha() string {
 	sha := "unknown"
 
 	buildInfo, ok := debug.ReadBuildInfo()
-	if ok {
-		sha = buildInfo.Main.Version
+	if ok && buildInfo.Main.Sum != "" {
+		sha = buildInfo.Main.Sum
 	}
 
 	return sha

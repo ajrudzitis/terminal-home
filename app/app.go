@@ -61,14 +61,17 @@ func (r *ResumeApp) mainMenu() {
 	}).SetTextAlign(tview.AlignCenter)
 	fmt.Fprint(banner, bannerContent)
 
-	version := tview.NewTextView().SetText(versioning.GetBuildSha())
+	version := tview.NewTextView().SetChangedFunc(func() {
+		r.tviewApp.Draw()
+	})
+	fmt.Fprintf(version, "version: %s", versioning.GetBuildSha())
 
 	mainView := tview.NewGrid().
-		SetRows(0, 0, 0).
+		SetRows(0, 0, 0, 1).
 		SetColumns(0, 0, 0).
 		AddItem(menu, 1, 1, 1, 1, 0, 0, true).
 		AddItem(banner, 0, 0, 1, 3, 0, 0, false).
-		AddItem(version, 2, 0, 0, 3, 0, 0, false)
+		AddItem(version, 3, 0, 1, 3, 0, 0, false)
 
 	r.tviewApp.SetRoot(mainView, true).SetFocus(menu)
 }
