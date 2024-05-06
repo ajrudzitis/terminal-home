@@ -54,6 +54,9 @@ func SqlGameView(app *tview.Application, quitFn func()) {
 			// record the query
 			fmt.Fprintf(terminalView, "> %s\n", input)
 
+			// log the query
+			log.Infof("sql: query: %s", input)
+
 			// hack: make a nice query for showing tables
 			if input == ".tables" || input == "show tables" {
 				input = "SELECT * FROM sqlite_master WHERE type='table';"
