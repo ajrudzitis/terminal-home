@@ -66,11 +66,16 @@ func (r *ResumeApp) mainMenu() {
 	})
 	fmt.Fprintf(version, "build: %s %s", versioning.GetBuildSha(), versioning.GetBuildTime())
 
+	spacer := tview.NewBox().SetBackgroundColor(tcell.ColorBlack)
+
 	mainView := tview.NewGrid().
 		SetRows(0, 0, 0, 1).
 		SetColumns(0, 0, 0).
-		AddItem(menu, 1, 1, 1, 1, 0, 0, true).
 		AddItem(banner, 0, 0, 1, 3, 0, 0, false).
+		AddItem(spacer, 1, 0, 1, 1, 0, 0, false).
+		AddItem(menu, 1, 1, 1, 1, 0, 0, true).
+		AddItem(spacer, 1, 2, 1, 1, 0, 0, false).
+		AddItem(spacer, 2, 0, 1, 3, 0, 0, false).
 		AddItem(version, 3, 0, 1, 3, 0, 0, false)
 
 	r.tviewApp.SetRoot(mainView, true).SetFocus(menu)

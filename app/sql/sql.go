@@ -117,9 +117,12 @@ func SqlGameView(app *tview.Application, quitFn func()) {
 	fmt.Fprint(terminalView, "Welcome to my experience database!\nType 'exit' or 'quit' to quit.\n\n")
 	fmt.Fprint(terminalView, "Hint: try 'show tables'\n\n")
 
+	spacer := tview.NewBox().SetBackgroundColor(tcell.ColorBlack)
+
 	mainView := tview.NewGrid().
 		SetRows(0, 1, 1).
 		AddItem(terminalView, 0, 0, 1, 1, 0, 0, false).
+		AddItem(spacer, 1, 0, 1, 1, 0, 0, false).
 		AddItem(inputView, 2, 0, 1, 1, 0, 0, true)
 
 	app.SetRoot(mainView, true).SetFocus(inputView)
