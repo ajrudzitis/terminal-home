@@ -64,7 +64,7 @@ func (r *ResumeApp) mainMenu() {
 	version := tview.NewTextView().SetChangedFunc(func() {
 		r.tviewApp.Draw()
 	})
-	fmt.Fprintf(version, "version: %s", versioning.GetBuildSha())
+	fmt.Fprintf(version, "build: %s %s", versioning.GetBuildSha(), versioning.GetBuildTime())
 
 	mainView := tview.NewGrid().
 		SetRows(0, 0, 0, 1).

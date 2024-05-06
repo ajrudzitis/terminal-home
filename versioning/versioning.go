@@ -1,14 +1,19 @@
 package versioning
 
-import "runtime/debug"
+import (
+	_ "embed"
+)
+
+//go:embed resources/sha
+var sha string
+
+//go:embed resources/build_time
+var buildTime string
 
 func GetBuildSha() string {
-	sha := "unknown"
-
-	buildInfo, ok := debug.ReadBuildInfo()
-	if ok && buildInfo.Main.Sum != "" {
-		sha = buildInfo.Main.Sum
-	}
-
 	return sha
+}
+
+func GetBuildTime() string {
+	return buildTime
 }

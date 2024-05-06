@@ -16,6 +16,12 @@ jobs:
       - name: Install dependencies
         run: go get .
 
+      - name: Record the commit sha and date
+        id: commit_info
+        run: |
+          echo $GITHUB_SHA > versioning/resources/sha
+          echo $(date '+%Y%m%d%H%M%S') > versioning/resources/build_time
+
       - name: Build
         run: GOARCH=arm64 go build -v -o terminal-home .
 
