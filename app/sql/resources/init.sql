@@ -1,7 +1,8 @@
 CREATE TABLE jobs (id, company, team, title, start_date, end_date);
 CREATE TABLE job_experiences (job_id, description);
 INSERT INTO jobs (id, company, team, title, start_date, end_date) VALUES (1, 'Amazon Web Services', 'AWS Cryptography', 'Senior Software Engineer', '2015-01', '2019-12');
-INSERT INTO jobs (id, company, team, title, start_date, end_date) VALUES (2, 'Stripe', 'Core Technology', 'Staff Software Engineer', '2020-01', 'Present');
+INSERT INTO jobs (id, company, team, title, start_date, end_date) VALUES (2, 'Stripe', 'Core Technology', 'Staff Software Engineer', '2020-01', '2024-07');
+INSERT INTO jobs (id, company, team, title, start_date, end_date) VALUES (3, 'Amazon Web Services', 'AWS Cryptography', 'Principal Engineer', '2024-07', 'Present');
 INSERT INTO job_experiences (job_id, description) VALUES (1, 'Designed and led the implementation of an AWS Key Management Service feature to allow the use of keys stored in the AWS CloudHSM product. This project involved collaboration with over a dozen engineers over multiple AWS teams.');
 INSERT INTO job_experiences (job_id, description) VALUES (1, 'Designed and implemented changes to the AWS Key Management Service to achieve FIPS 140-2 validation.');
 INSERT INTO job_experiences (job_id, description) VALUES (1, 'Designed and led the implementation of an AWS Key Management Service feature to allow the import of keys by customers from on-premise hardware security modules.');
@@ -14,3 +15,4 @@ INSERT INTO job_experiences (job_id, description) VALUES (2, 'Created a weekly o
 INSERT INTO job_experiences (job_id, description) VALUES (2, 'Developed and led the execution of a new, safer key rotation procedure to rotate Stripe’s Tier-0 and Tier-1 PCI encryption keys.');
 INSERT INTO job_experiences (job_id, description) VALUES (2, 'Collaborated with internal compliance teams to complete SOX, SOC, and PCI-DSS audits of Stripe’s cardholder data environment.');
 INSERT INTO job_experiences (job_id, description) VALUES (2, 'Collaborated with legal and product teams to develop a strategy for compliance with new India payment processor regulations.');
+INSERT INTO job_experiences (job_id, description) VALUES (3, 'Developing a new, high-performance cryptographic dataplane for core services.');

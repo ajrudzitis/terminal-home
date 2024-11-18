@@ -3,7 +3,14 @@ https://www.aleksrudzitis.com
 Work History
 ==
 
-Staff Software Engineer January 2020 - Present
+Principal Engineer July 2024 - Present
+AWS Cryptography - Amazon Web Services
+--
+
+– Developing a new, high-performance cryptographic dataplane for core services.
+
+
+Staff Software Engineer January 2020 - July 2024
 Core Technology - Stripe
 --
 
